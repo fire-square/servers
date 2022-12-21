@@ -6,6 +6,12 @@ let
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {} nogui";
     package = pkgs.mineflake.paper;
   };
+
+  proxy = pkgs.mineflake.buildMineflakeBin {
+    type = "bungee";
+    command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {}";
+    package = pkgs.mineflake.waterfall;
+  };
 in
 {
   systemd.services.fire-lobby = {
@@ -26,6 +32,26 @@ in
     createHome = true;
     group = "fire-minecraft";
     home = "/var/lib/fire-lobby";
+  };
+
+  systemd.services.fire-proxy = {
+    description = "Firesquare proxy";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${proxy}/bin/mineflake";
+      User = "fire-proxy";
+      Group = "fire-minecraft";
+      WorkingDirectory = "/var/lib/fire-proxy";
+    };
+  };
+
+  users.users.fire-proxy = {
+    isSystemUser = true;
+    createHome = true;
+    group = "fire-minecraft";
+    home = "/var/lib/fire-proxy";
   };
 
   users.groups.fire-minecraft = { };
