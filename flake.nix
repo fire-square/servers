@@ -5,6 +5,9 @@
   };
   outputs = { self, nixpkgs, mineflake, ... }:
     {
-      nixosModules.default = import ./default.nix;
+      nixosModules.default = {
+        imports = [ ./default.nix ];
+        nixpkgs.overlays = [ mineflake.overlays.default ];
+      };
     };
 }
