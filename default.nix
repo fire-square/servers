@@ -23,6 +23,7 @@ in
 
   users.users.fire-lobby = {
     isSystemUser = true;
+    createHome = true;
     group = "fire-minecraft";
     home = "/var/lib/fire-lobby";
   };
