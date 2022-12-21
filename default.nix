@@ -5,12 +5,18 @@ let
     type = "spigot";
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {} nogui";
     package = pkgs.mineflake.paper;
+    plugins = with pkgs.mineflake; [
+      luckperms
+    ];
   };
 
   proxy = pkgs.mineflake.buildMineflakeBin {
     type = "bungee";
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {}";
     package = pkgs.mineflake.waterfall;
+    plugins = with pkgs.mineflake; [
+      luckperms
+    ];
   };
 in
 {
