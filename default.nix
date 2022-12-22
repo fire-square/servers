@@ -7,6 +7,7 @@ let
     package = pkgs.mineflake.paper;
     plugins = with pkgs.mineflake; [
       luckperms
+      coreprotect
     ];
   };
 
@@ -14,9 +15,9 @@ let
     type = "bungee";
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {}";
     package = pkgs.mineflake.waterfall;
-    plugins = with pkgs.mineflake; [
-      luckperms
-    ];
+    # plugins = with pkgs.mineflake; [
+      # luckperms
+    # ];
   };
 in
 {
