@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, mineflake, ... }:
 
 let
   lobby = pkgs.mineflake.buildMineflakeBin {
@@ -10,7 +10,7 @@ let
       coreprotect
     ];
     configs = [
-      (mineflake.mkMfConfig "raw" "server.properties" ''
+      (pkgs.mineflake.mkMfConfig "raw" "server.properties" ''
         enable-command-block=false
         server-ip=0.0.0.0
         server-port=25000
@@ -25,7 +25,7 @@ let
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {}";
     package = pkgs.mineflake.waterfall;
     configs = [
-      (mineflake.mkMfConfig "mergeyaml" "config.yml" {
+      (pkgs.mineflake.mkMfConfig "mergeyaml" "config.yml" {
         online_mode = false;
         listeners = [
           {
