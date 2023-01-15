@@ -37,11 +37,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1671726017,
-        "narHash": "sha256-zqtBl7PgcNFu0eZrhjcQCcZLVQl1bu/JnW401u+15RM=",
+        "lastModified": 1673442852,
+        "narHash": "sha256-TXwywMpLzzUDH9G7bRohGgz8+qmbFl6Pfsd7MZwVbRQ=",
         "owner": "nix-community",
         "repo": "mineflake",
-        "rev": "eba6ff4d431b7fbe274ba5fbf538ca6e14c04ade",
+        "rev": "e979ffbe7a7d35b763c8933786e82bc51fd83a52",
         "type": "github"
       },
       "original": {
