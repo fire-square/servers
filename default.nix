@@ -1,13 +1,26 @@
 { pkgs, mineflake, ... }:
 
 let
-  lobby = pkgs.mineflake.buildMineflakeBin {
+  paperCommon = {
     type = "spigot";
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {} nogui";
     package = pkgs.mineflake.paper;
+    # plugins = with pkgs.mineflake; [
+    #   luckperms
+    # ];
+    # configs = [
+    #   (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
+    #     settings = {
+    #       restart-on-crash = false;
+    #       bungeecord = true;
+    #     };
+    #   })
+    # ];
+  };
+
+  lobby = pkgs.mineflake.buildMineflakeBin (paperCommon // {
     plugins = with pkgs.mineflake; [
       luckperms
-      coreprotect
     ];
     configs = [
       (pkgs.mineflake.mkMfConfig "raw" "server.properties" ''
@@ -17,8 +30,36 @@ let
         query.port=25000
         online-mode=false
       '')
+      (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
+        settings = {
+          restart-on-crash = false;
+          bungeecord = true;
+        };
+      })
     ];
-  };
+  });
+
+  vanilla = pkgs.mineflake.buildMineflakeBin (paperCommon // {
+    plugins = with pkgs.mineflake; [
+      coreprotect
+      luckperms
+    ];
+    configs = [
+      (pkgs.mineflake.mkMfConfig "raw" "server.properties" ''
+        enable-command-block=false
+        server-ip=0.0.0.0
+        server-port=25001
+        query.port=25001
+        online-mode=false
+      '')
+      (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
+        settings = {
+          restart-on-crash = false;
+          bungeecord = true;
+        };
+      })
+    ];
+  });
 
   proxy = pkgs.mineflake.buildMineflakeBin {
     type = "bungee";
@@ -27,17 +68,25 @@ let
     configs = [
       (pkgs.mineflake.mkMfConfig "mergeyaml" "config.yml" {
         online_mode = false;
+        ip_forward = true;
+        player_limit = 20;
         listeners = [
           {
             host = "0.0.0.0:25565";
             query_port = 25565;
             motd = "&1Firesquare V2!";
             max_players = 20;
+            forced_hosts = { };
+            query_enabled = true;
+            priorities = [ "lobby" ];
           }
         ];
         servers = {
           lobby = {
             address = "127.0.0.1:25000";
+          };
+          vanilla = {
+            address = "127.0.0.1:25001";
           };
         };
       })
@@ -54,7 +103,7 @@ in
       ExecStart = "${lobby}/bin/mineflake";
       User = "fire-lobby";
       Group = "fire-minecraft";
-      WorkingDirectory = "/var/lib/firesquare/lobby";
+      WorkingDirectory = "/var/lib/fire-lobby";
     };
   };
 
@@ -62,7 +111,27 @@ in
     isSystemUser = true;
     createHome = true;
     group = "fire-minecraft";
-    home = "/var/lib/firesquare/lobby";
+    home = "/var/lib/fire-lobby";
+  };
+
+  systemd.services.fire-vanilla = {
+    description = "Firesquare lobby";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${vanilla}/bin/mineflake";
+      User = "fire-vanilla";
+      Group = "fire-minecraft";
+      WorkingDirectory = "/var/lib/fire-vanilla";
+    };
+  };
+
+  users.users.fire-vanilla = {
+    isSystemUser = true;
+    createHome = true;
+    group = "fire-minecraft";
+    home = "/var/lib/fire-vanilla";
   };
 
   systemd.services.fire-proxy = {
@@ -74,7 +143,7 @@ in
       ExecStart = "${proxy}/bin/mineflake";
       User = "fire-proxy";
       Group = "fire-minecraft";
-      WorkingDirectory = "/var/lib/firesquare/proxy";
+      WorkingDirectory = "/var/lib/fire-proxy";
     };
   };
 
@@ -82,7 +151,7 @@ in
     isSystemUser = true;
     createHome = true;
     group = "fire-minecraft";
-    home = "/var/lib/firesquare/proxy";
+    home = "/var/lib/fire-proxy";
   };
 
   users.groups.fire-minecraft = { };
