@@ -17,7 +17,43 @@ let
         bungeecord = true;
       };
     })
+    (pkgs.mineflake.mkMfConfig "mergeyaml" "plugins/LuckPerms/config.yml" {
+      storage-method = "YAML";
+      data = {
+        address = "127.0.0.1";
+        database = "luckperms";
+        username = "firesquare";
+        password = "#DB_PASSWORD#";
+        table-prefix = "";
+      };
+      split-storage = {
+        enabled = true;
+        methods = {
+          user = "MySQL";
+          group = "YAML";
+          track = "YAML";
+          uuid = "MySQL";
+          log = "MySQL";
+        };
+      };
+      sync-minutes = 15;
+      messaging-service = "sql";
+      temporary-add-behaviour = "accumulate";
+      enable-ops = false;
+      auto-op = true;
+      prevent-primary-group-removal = true;
+    })
   ];
+
+  commonService = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" "mysql.service" ];
+    serviceConfig = {
+      Type = "simple";
+      Group = "fire-minecraft";
+      EnvironmentFile = "/run/passwords.env";
+    };
+  };
 
   lobby = pkgs.mineflake.buildMineflakeBin (paperCommon // {
     plugins = with pkgs.mineflake; [
@@ -83,15 +119,11 @@ let
   };
 in
 {
-  systemd.services.fire-lobby = {
+  systemd.services.fire-lobby = commonService // {
     description = "Firesquare lobby";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
     serviceConfig = {
-      Type = "simple";
       ExecStart = "${lobby}/bin/mineflake";
       User = "fire-lobby";
-      Group = "fire-minecraft";
       WorkingDirectory = "/var/lib/fire-lobby";
     };
   };
@@ -103,15 +135,11 @@ in
     home = "/var/lib/fire-lobby";
   };
 
-  systemd.services.fire-vanilla = {
+  systemd.services.fire-vanilla = commonService // {
     description = "Firesquare lobby";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
     serviceConfig = {
-      Type = "simple";
       ExecStart = "${vanilla}/bin/mineflake";
       User = "fire-vanilla";
-      Group = "fire-minecraft";
       WorkingDirectory = "/var/lib/fire-vanilla";
     };
   };
@@ -123,15 +151,11 @@ in
     home = "/var/lib/fire-vanilla";
   };
 
-  systemd.services.fire-proxy = {
+  systemd.services.fire-proxy = commonService // {
     description = "Firesquare proxy";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
     serviceConfig = {
-      Type = "simple";
       ExecStart = "${proxy}/bin/mineflake";
       User = "fire-proxy";
-      Group = "fire-minecraft";
       WorkingDirectory = "/var/lib/fire-proxy";
     };
   };
