@@ -8,21 +8,22 @@ let
     # plugins = with pkgs.mineflake; [
     #   luckperms
     # ];
-    # configs = [
-    #   (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
-    #     settings = {
-    #       restart-on-crash = false;
-    #       bungeecord = true;
-    #     };
-    #   })
-    # ];
   };
+
+  commonPaperConfigs = [
+    (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
+      settings = {
+        restart-on-crash = false;
+        bungeecord = true;
+      };
+    })
+  ];
 
   lobby = pkgs.mineflake.buildMineflakeBin (paperCommon // {
     plugins = with pkgs.mineflake; [
       luckperms
     ];
-    configs = [
+    configs = commonPaperConfigs ++ [
       (pkgs.mineflake.mkMfConfig "raw" "server.properties" ''
         enable-command-block=false
         server-ip=0.0.0.0
@@ -30,12 +31,6 @@ let
         query.port=25000
         online-mode=false
       '')
-      (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
-        settings = {
-          restart-on-crash = false;
-          bungeecord = true;
-        };
-      })
     ];
   });
 
@@ -44,7 +39,7 @@ let
       coreprotect
       luckperms
     ];
-    configs = [
+    configs = commonPaperConfigs ++ [
       (pkgs.mineflake.mkMfConfig "raw" "server.properties" ''
         enable-command-block=false
         server-ip=0.0.0.0
@@ -52,12 +47,6 @@ let
         query.port=25001
         online-mode=false
       '')
-      (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
-        settings = {
-          restart-on-crash = false;
-          bungeecord = true;
-        };
-      })
     ];
   });
 
@@ -155,4 +144,21 @@ in
   };
 
   users.groups.fire-minecraft = { };
+
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+    settings = {
+      mysqld = {
+        max_connections = 512;
+      };
+    };
+    ensureDatabases = [ "luckperms" ];
+    ensureUsers = [{
+      name = "firesquare";
+      ensurePermissions = {
+        "luckperms.*" = "ALL PRIVILEGES";
+      };
+    }];
+  };
 }
