@@ -23,7 +23,7 @@ let
         address = "127.0.0.1";
         database = "luckperms";
         username = "firesquare";
-        password = "#DB_PASSWORD#";
+        password = "{{DB_PASSWORD}}";
         table-prefix = "";
       };
       split-storage = {
@@ -52,6 +52,7 @@ let
       Type = "simple";
       Group = "fire-minecraft";
       EnvironmentFile = "/run/passwords.env";
+      PassEnvironment = "DB_PASSWORD";
     };
   };
 
