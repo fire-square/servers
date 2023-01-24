@@ -23,8 +23,9 @@ let
         address = "127.0.0.1";
         database = "luckperms";
         username = "firesquare";
-        password = "{{DB_PASSWORD}}";
+        password = "changeme";
         table-prefix = "";
+        sync-minutes = 15;
       };
       split-storage = {
         enabled = true;
@@ -36,7 +37,6 @@ let
           log = "MySQL";
         };
       };
-      sync-minutes = 15;
       messaging-service = "sql";
       temporary-add-behaviour = "accumulate";
       enable-ops = false;
@@ -51,8 +51,8 @@ let
     serviceConfig = {
       Type = "simple";
       Group = "fire-minecraft";
-      EnvironmentFile = "/run/passwords.env";
-      PassEnvironment = "DB_PASSWORD";
+      # EnvironmentFile = "/run/passwords.env";
+      # PassEnvironment = "DB_PASSWORD";
     };
   };
 
