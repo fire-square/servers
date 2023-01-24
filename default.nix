@@ -5,10 +5,22 @@ let
     type = "spigot";
     command = "${pkgs.jre_headless}/bin/java -Xms1G -Xmx1G -jar {} nogui";
     package = pkgs.mineflake.paper;
+    permissions = permissions;
     # plugins = with pkgs.mineflake; [
     #   luckperms
     # ];
   };
+
+  permissions = [
+    {
+      name = "default";
+      permissions = [ ];
+    }
+    {
+      name = "admin";
+      permissions = [ "luckperms.*" ];
+    }
+  ];
 
   commonPaperConfigs = [
     (pkgs.mineflake.mkMfConfig "mergeyaml" "spigot.yml" {
@@ -18,7 +30,7 @@ let
       };
     })
     (pkgs.mineflake.mkMfConfig "mergeyaml" "plugins/LuckPerms/config.yml" {
-      storage-method = "YAML";
+      storage-method = "json";
       data = {
         address = "127.0.0.1";
         database = "luckperms";
@@ -30,11 +42,11 @@ let
       split-storage = {
         enabled = true;
         methods = {
-          user = "MySQL";
-          group = "YAML";
-          track = "YAML";
-          uuid = "MySQL";
-          log = "MySQL";
+          user = "mysql";
+          group = "json";
+          track = "json";
+          uuid = "mysql";
+          log = "mysql";
         };
       };
       messaging-service = "sql";
