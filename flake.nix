@@ -1,7 +1,10 @@
 {
   inputs = {
-    nixpkgs.follows = "mineflake/nixpkgs";
-    mineflake.url = "github:nix-community/mineflake";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    mineflake = {
+      url = "github:nix-community/mineflake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs = { self, nixpkgs, mineflake, ... }:
     {
